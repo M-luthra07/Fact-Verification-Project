@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>LIAR Dataset Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Fake News Detection</h1>
+
+        <form action="/predict" method="POST">
+            <textarea name="user_input" placeholder="Enter a news statement..." required>{{ input_text }}</textarea><br>
+            <button type="submit">Predict</button>
+        </form>
+
+        {% if prediction %}
+        <div class="result">
+            <strong>Prediction:</strong> <span>{{ prediction }}</span>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <form action="/analysis">
+            <button type="submit" class="analysis-button">View Analysis</button>
+        </form>
+
+    </div>
+</body>
+</html>
+

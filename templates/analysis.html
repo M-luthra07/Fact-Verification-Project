@@ -1,0 +1,78 @@
+t<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Model Analysis</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Model Training Analysis</h1>
+
+        <canvas id="lossChart" width="400" height="250"></canvas>
+        <canvas id="accuracyChart" width="400" height="250"></canvas>
+        <canvas id="barChart" width="400" height="250"></canvas>
+
+      <form action="/">
+            <button type="submit"  class="analysis-button">Back to Home</button>
+        </form>
+    </div>
+
+    <script>
+        const epochs = {{ epochs }};
+        const trainLoss = {{ train_loss }};
+        const valLoss = {{ val_loss }};
+        const trainAcc = {{ train_acc }};
+        const valAcc = {{ val_acc }};
+        const trueCount = {{ true_count }};
+        const falseCount = {{ false_count }};
+
+        const ctx1 = document.getElementById('lossChart').getContext('2d');
+        new Chart(ctx1, {
+            type: 'line',
+            data: {
+                labels: epochs,
+                datasets: [
+                    { label: 'Training Loss', data: trainLoss, borderColor: 'blue', fill: false },
+                    { label: 'Validation Loss', data: valLoss, borderColor: 'red', fill: false }
+                ]
+            },
+            options: {
+                plugins: { title: { display: true, text: 'Loss Curve' } }
+            }
+        });
+
+        const ctx2 = document.getElementById('accuracyChart').getContext('2d');
+        new Chart(ctx2, {
+            type: 'line',
+            data: {
+                labels: epochs,
+                datasets: [
+                    { label: 'Training Accuracy', data: trainAcc, borderColor: 'green', fill: false },
+                    { label: 'Validation Accuracy', data: valAcc, borderColor: 'orange', fill: false }
+                ]
+            },
+            options: {
+                plugins: { title: { display: true, text: 'Accuracy Curve' } }
+            }
+        });
+
+        const ctx3 = document.getElementById('barChart').getContext('2d');
+        new Chart(ctx3, {
+            type: 'bar',
+            data: {
+                labels: ['True', 'False'],
+                datasets: [{
+                    label: 'Prediction Count',
+                    data: [trueCount, falseCount],
+                    backgroundColor: ['green', 'crimson']
+                }]
+            },
+            options: {
+                plugins: { title: { display: true, text: 'True vs False Predictions' } }
+            }
+        });
+    </script>
+</body>
+</html>
