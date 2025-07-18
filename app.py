@@ -5,6 +5,7 @@ import os
 import zipfile
 import gdown
 
+GDRIVE_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
 app = Flask(__name__)
 MODEL_DIR = "saved_model"
 GDRIVE_FILE_ID = "1BrzkJwAIO0_G1V7hxNahkcAt6zxXSNKq"
