@@ -5,19 +5,24 @@ import os
 import zipfile
 import gdown
 
-GDRIVE_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
 app = Flask(__name__)
-MODEL_DIR = "saved_model"
-GDRIVE_FILE_ID = "1BrzkJwAIO0_G1V7hxNahkcAt6zxXSNKq"
-GDRIVE_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
 
-# Download and extract model only if not already present
+# ───────────────────── Model Setup ─────────────────────
+
+MODEL_DIR = "saved_model"
+MODEL_ZIP = "saved_model.zip"
+GDRIVE_FILE_ID = os.getenv("MODEL_FILE_ID")  # Set this in Railway variables
+
+if not GDRIVE_FILE_ID:
+    raise ValueError("MODEL_FILE_ID environment variable is not set!")
+
+# Download and unzip model if not already available
 if not os.path.exists(MODEL_DIR):
-    print("Model not found. Downloading from Google Drive...")
-    gdown.download(GDRIVE_URL, MODEL_ZIP, quiet=False)
+    print("📥 Downloading model from Google Drive...")
+    gdown.download(f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}", MODEL_ZIP, quiet=False)
     with zipfile.ZipFile(MODEL_ZIP, 'r') as zip_ref:
         zip_ref.extractall(MODEL_DIR)
-    print("Model downloaded and extracted.")
+    print("✅ Model downloaded and extracted.")
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True)
@@ -70,6 +75,6 @@ def metrics_api():
         "false_count": 80
     })
 
-# ───────────────────────────────────────
+# ────────────────────────────────────────────────
 if __name__ == '__main__':
     app.run(debug=True, port=5000)
