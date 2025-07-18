@@ -1,22 +1,30 @@
 from flask import Flask, render_template, request, jsonify
 import torch
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
-
-app = Flask(__name__)
 import os
 import zipfile
+import gdown
 
-# Automatically unzip model if not already extracted
-if not os.path.exists("saved_model"):
-    with zipfile.ZipFile("saved_model.zip", 'r') as zip_ref:
-        zip_ref.extractall("saved_model")
-
+app = Flask(__name__)
 MODEL_DIR = "saved_model"
+GDRIVE_FILE_ID = "1BrzkJwAIO0_G1V7hxNahkcAt6zxXSNKq"
+GDRIVE_URL = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+
+# Download and extract model only if not already present
+if not os.path.exists(MODEL_DIR):
+    print("Model not found. Downloading from Google Drive...")
+    gdown.download(GDRIVE_URL, MODEL_ZIP, quiet=False)
+    with zipfile.ZipFile(MODEL_ZIP, 'r') as zip_ref:
+        zip_ref.extractall(MODEL_DIR)
+    print("Model downloaded and extracted.")
 
 # Load tokenizer and model
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR, local_files_only=True)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR, local_files_only=True)
 model.eval()
+
+# ───────────────────── Routes ─────────────────────
+
 @app.route('/')
 def home():
     return render_template("index.html", prediction=None, input_text="")
@@ -34,8 +42,8 @@ def predict():
         predicted_class = torch.argmax(logits, dim=1).item()
 
     label = "True" if predicted_class == 1 else "False"
-
     return render_template("index.html", prediction=label, input_text=text)
+
 @app.route('/analysis')
 def analysis():
     metrics = {
